@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Export Reviews Extension by ShopWhizzy
+ *
+ * @category  ShopWhizzy
+ * @package   ShopWhizzy_ExportReviews
+ * @author    ShopWhizzy <info@shopwhizzy.com>
+ * @copyright Copyright (c) 2025 ShopWhizzy (https://github.com/shopwhizzy)
+ * @license https://opensource.org/licenses/MIT
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/review/approved" method="GET">
+        <service class="ShopWhizzy\ExportReviews\Api\Data\ReviewInterface" method="getReviews"/>
+        <resources>
+            <resource ref="Magento_CatalogInventory::cataloginventory"/>
+        </resources>
+    </route>
+        <route url="/V1/review/approved/:sku" method="GET">
+            <service class="ShopWhizzy\ExportReviews\Api\Data\ReviewInterface" method="getReviewsBySku"/>
+            <resources>
+                <resource ref="Magento_CatalogInventory::cataloginventory"/>
+            </resources>
+        </route>
+</routes>

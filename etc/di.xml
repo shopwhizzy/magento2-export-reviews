@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Export Reviews Extension by ShopWhizzy
+ *
+ * @category  ShopWhizzy
+ * @package   ShopWhizzy_ExportReviews
+ * @author    ShopWhizzy <info@shopwhizzy.com>
+ * @copyright Copyright (c) 2025 ShopWhizzy (https://github.com/shopwhizzy)
+ * @license https://opensource.org/licenses/MIT
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="export_reviews" xsi:type="object">\ShopWhizzy\ExportReviews\Console\Export</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="ShopWhizzy\ExportReviews\Api\Data\ReviewInterface"
+                type="ShopWhizzy\ExportReviews\Model\Review"/>
+</config>

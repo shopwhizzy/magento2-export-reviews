@@ -1,0 +1,43 @@
+{
+  "name": "shopwhizzy/magento2-export-reviews",
+  "description": "Export Reviews Extension by ShopWhizzy.",
+  "type": "magento2-module",
+  "version": "2.0.0",
+  "license": [
+	"OSL-3.0",
+	"AFL-3.0"
+  ],
+  "require": {
+    "magento/module-catalog": "*",
+    "magento/module-review": "*",
+	"php": ">=7.4"
+  },
+  "authors": [
+	{
+	  "name": "ShopWhizzy",
+	  "email": "info@shopwhizzy.com",
+	  "homepage": "https://github.com/shopwhizzy",
+	  "role": "Adobe Commerce Developers"
+	}
+  ],
+  "keywords": [
+	"magento",
+	"magento2",
+	"module",
+	"extension"
+  ],
+  "repositories": [
+	{
+	  "type": "composer",
+	  "url": "https://repo.magento.com/"
+	}
+  ],
+  "autoload": {
+	"files": [
+      "registration.php"
+    ],
+	"psr-4": {
+	  "ShopWhizzy\\ExportReviews\\": ""
+	}
+  }
+}
