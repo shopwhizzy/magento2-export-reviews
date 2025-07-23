@@ -53,6 +53,18 @@ class Review extends AbstractDb
     }
 
     /**
+     * Check if the email column exists in the review_detail table
+     *
+     * @return bool
+     */
+    private function hasEmailColumn(): bool
+    {
+        $connection = $this->getConnection();
+        $columns = $connection->describeTable($this->reviewDetailTable);
+        return array_key_exists('email', $columns);
+    }
+
+    /**
      * Load all approved reviews from DB
      *
      * @param string|null $sku
@@ -64,9 +76,27 @@ class Review extends AbstractDb
 
         $approvedStatusId = 1;
 
+        $selectColumns = [
+            'r.review_id',
+            'r.status_id',
+            'r.created_at',
+            'r.entity_pk_value',
+            'rd.title',
+            'rd.detail',
+            'res.rating_summary',
+            'rd.nickname',
+            'rd.customer_id',
+            'cpe.sku'
+        ];
+
+        // Conditionally add rd.email if the column exists
+        if ($this->hasEmailColumn()) {
+            $selectColumns[] = 'rd.email';
+        }
+
         $select = $connection->select()->from(
             ['r' => $this->reviewTable],
-            ['r.review_id', 'r.status_id', 'r.created_at', 'r.entity_pk_value', 'rd.title', 'rd.detail', 'res.rating_summary', 'rd.nickname', 'rd.email', 'cpe.sku']
+            $selectColumns
         )->joinLeft(
             ['rd' => $this->getTable('review_detail')],
             'rd.review_id = r.review_id',
@@ -82,12 +112,10 @@ class Review extends AbstractDb
         );
 
         $select->where('r.status_id = ?', $approvedStatusId);
-        if ($sku)
-        {
+        if ($sku) {
             $select->where('cpe.sku = ?', $sku);
         }
 
-        $selectString = $select->__toString();
         $result = $connection->fetchAll($select);
         return $result;
     }

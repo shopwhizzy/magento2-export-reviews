@@ -23,6 +23,7 @@ use ShopWhizzy\ExportReviews\Api\Data\ReviewInterfaceFactory;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -46,21 +47,29 @@ class Export extends Command
     private WriteInterface $directory;
 
     /**
+     * @var CustomerRepositoryInterface
+     */
+    private CustomerRepositoryInterface $customerRepository;
+
+    /**
      * Import constructor.
      * @param ReviewInterfaceFactory $reviewInterfaceFactory
      * @param State $appState
      * @param Filesystem $filesystem
+     * @param CustomerRepositoryInterface $customerRepository
      * @throws FileSystemException
      */
     public function __construct(
         ReviewInterfaceFactory $reviewInterfaceFactory,
         State $appState,
-        Filesystem $filesystem
+        Filesystem $filesystem,
+        CustomerRepositoryInterface $customerRepository
     ) {
         parent::__construct();
         $this->appState = $appState;
         $this->directory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
         $this->reviewInterfaceFactory = $reviewInterfaceFactory;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -103,7 +112,16 @@ class Export extends Command
             $data[] = $review['rating_summary'];
             $data[] = number_format(($review['rating_summary'] / 100) * 5, 1);
             $data[] = $review['nickname'];
-            $data[] = $review['email'];
+            $email = $review['email'] ?? '';
+            if (empty($email) && !empty($review['customer_id'])) {
+                try {
+                    $customer = $this->customerRepository->getById($review['customer_id']);
+                    $email = $customer->getEmail();
+                } catch (\Exception $e) {
+                    $email = '';
+                }
+            }
+            $data[] = $email;
             $data[] = $review['sku'];
             $stream->writeCsv($data);
         endforeach;
@@ -117,12 +135,9 @@ class Export extends Command
      */
     protected function areaCodeFix()
     {
-        try
-        {
+        try {
             $this->appState->getAreaCode();
-        }
-        catch (\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             $this->appState->setAreaCode(Area::AREA_GLOBAL);
         }
     }
